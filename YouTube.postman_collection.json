@@ -1,0 +1,358 @@
+{
+	"info": {
+		"_postman_id": "105bdbf6-ef48-4a5e-a8d8-3330464e8e8b",
+		"name": "YouTube",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "17416266",
+		"_collection_link": "https://knakra92.postman.co/workspace/Team-Workspace~cfb223c5-b336-4e93-863b-fc9950e64b96/collection/17416266-105bdbf6-ef48-4a5e-a8d8-3330464e8e8b?action=share&creator=17416266&source=collection_link"
+	},
+	"item": [
+		{
+			"name": "AutoComplete Search",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Verify Status Code\",function(){",
+							"    pm.response.to.have.status(200)",
+							"})",
+							"",
+							"const response = pm.response.json()",
+							"",
+							"pm.test(\"Verify query starts with ssdn\", function(){",
+							"    pm.expect(response.query).to.eql('ssdn')",
+							"",
+							"    for(r in response.results){  ",
+							"        resp = response.results[r]",
+							"        pm.expect(resp.split(\" \")[0]).to.include(\"ssdn\")",
+							"    } ",
+							"})",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "apikey",
+						"value": "{{api_key}}",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "{{base_url}}/auto-complete?q=ssdn",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"auto-complete"
+					],
+					"query": [
+						{
+							"key": "q",
+							"value": "ssdn"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get Video Search",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"verify status code\",function(){",
+							"    pm.response.to.have.status(200)",
+							"})",
+							"",
+							"const response = pm.response.json()",
+							"const contents = response.contents",
+							"pm.collectionVariables.set(\"videoID\", contents[29].video.videoId)",
+							"",
+							"pm.test(\"verify response to be not null\",function(){",
+							"    pm.expect(response).to.not.null",
+							"})",
+							"",
+							"pm.test(\"Verify response type is video or channel\", function(){",
+							"    for(index in contents){",
+							"       current_item = contents[index]",
+							"       pm.expect(current_item.type == \"video\" || current_item.type == \"channel\").equal(true)",
+							"    }",
+							"})",
+							"",
+							"pm.test(\"Verify query includes the expected search\", function(){",
+							"    for(index in contents){",
+							"        current_item = contents[index]",
+							"        if(current_item.type==\"video\"){",
+							"            pm.expect(current_item.video.title).to.not.null",
+							"            pm.expect(current_item.video.title).to.not.undefined",
+							"        }",
+							"        if(current_item.type ==\"channel\"){",
+							"            pm.expect(current_item.channel.title).to.not.null",
+							"            pm.expect(current_item.channel.title).to.not.undefined",
+							"        }",
+							"    }",
+							"    ",
+							"})",
+							"",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "apikey",
+						"value": "{{api_key}}",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "{{base_url}}/search?q={{search_query_param}}",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"search"
+					],
+					"query": [
+						{
+							"key": "q",
+							"value": "{{search_query_param}}"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get Video Comments",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Verify Status Code\",function(){",
+							"    pm.response.to.have.status(200)",
+							"})",
+							"",
+							"const response = pm.response.json()",
+							" comments = response.comments",
+							"",
+							"pm.test(\"Verify comment ID\", function(){",
+							"   ",
+							"    for(index in comments){",
+							"    new_response = comments[index]",
+							"    pm.expect(new_response.commentId).to.not.null",
+							"    }  ",
+							"",
+							"})",
+							"",
+							"pm.test(\"Verify content\", function(){",
+							"    for (index in comments){",
+							"        new_response = comments[index]",
+							"        pm.expect(new_response.content).length.greaterThan(0)",
+							"        pm.expect(new_response.content).to.be.string",
+							"    }",
+							"})",
+							"",
+							"pm.test(\"Verify video has atleast one comment\",function(){",
+							"    pm.expect(comments.length).greaterThan(0)",
+							"})"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "apikey",
+						"value": "{{api_key}}",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "{{base_url}}/video/comments?id={{videoID}}",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"video",
+						"comments"
+					],
+					"query": [
+						{
+							"key": "id",
+							"value": "{{videoID}}"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get Video Details",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Verify status code\", function(){",
+							"    pm.response.to.have.status(200)",
+							"})",
+							"const response = pm.response.json()",
+							"const new_response = response.author",
+							"",
+							"pm.test(\"Verify title as 'Karan Khan'\",function(){",
+							"    pm.expect(new_response.title).eql(\"Karan Khan\")",
+							"})",
+							"",
+							"pm.test(\"Verify album is 'Maikada'\",function(){",
+							"    const music = response.musics",
+							"",
+							"    current_item =music[0]",
+							"    pm.expect(current_item.attributes.album).to.eql(\"Maikada\")",
+							"",
+							"})",
+							"",
+							"",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{base_url}}/video/details?id={{videoID}}",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"video",
+						"details"
+					],
+					"query": [
+						{
+							"key": "id",
+							"value": "{{videoID}}"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get Video Related Content",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Verify Status Code\",function(){",
+							"    pm.response.to.have.status(200)",
+							"})",
+							"",
+							"const response = pm.response.json()",
+							"",
+							"pm.test(\"Verify VideoID is not in response\",function(){",
+							"    const content = response.contents",
+							"    for (index in content){",
+							"        current_item = content[index]",
+							"        if (current_item.type==\"video\"){",
+							"            pm.expect(current_item.video.videoId).not.eql('QEcPDrVaSVQ')",
+							"        }",
+							"    }",
+							"})"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{base_url}}/video/related-contents?id={{videoID}}",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"video",
+						"related-contents"
+					],
+					"query": [
+						{
+							"key": "id",
+							"value": "{{videoID}}"
+						}
+					]
+				}
+			},
+			"response": []
+		}
+	],
+	"auth": {
+		"type": "apikey",
+		"apikey": [
+			{
+				"key": "value",
+				"value": "",
+				"type": "string"
+			},
+			{
+				"key": "key",
+				"value": "apikey",
+				"type": "string"
+			}
+		]
+	},
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"key": "base_url",
+			"value": "https://api.apilayer.com/youtube"
+		},
+		{
+			"key": "search_query_param",
+			"value": ""
+		},
+		{
+			"key": "videoID",
+			"value": ""
+		}
+	]
+}
